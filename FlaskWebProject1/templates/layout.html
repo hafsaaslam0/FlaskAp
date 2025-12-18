@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ title }} · Bilal RAHAOUI</title>
     <style>
         :root {
             color-scheme: light dark;
@@ -80,138 +79,21 @@
                 margin: 0 0.75rem;
             }
         }
-        #fireworks-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
     </style>
 </head>
 <body>
-    <canvas id="fireworks-canvas"></canvas>
     <header>
-        <div class="brand">Bilal RAHAOUI</div>
         <nav>
             <a href="{{ url_for('home') }}" class="{% if request.path == '/' or request.path == '/home' %}active{% endif %}">Home</a>
             <a href="{{ url_for('about') }}" class="{% if request.path == '/about' %}active{% endif %}">About</a>
             <a href="{{ url_for('contact') }}" class="{% if request.path == '/contact' %}active{% endif %}">Contact</a>
         </nav>
     </header>
+
     <main>
         <section class="card">
             {% block content %}{% endblock %}
         </section>
     </main>
-    <footer>
-        Crafted with focus · {{ year }} · Bilal RAHAOUI
-    </footer>
-    <script>
-        // Fireworks Animation (limited to ~3 seconds)
-        (function() {
-            const canvas = document.getElementById('fireworks-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-            
-            const particles = [];
-            let running = true;
-            const colors = ['#38bdf8', '#5eead4', '#fbbf24', '#f87171', '#a78bfa', '#fb7185'];
-            
-            class Particle {
-                constructor(x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.vx = (Math.random() - 0.5) * 8;
-                    this.vy = (Math.random() - 0.5) * 8;
-                    this.life = 1;
-                    this.decay = Math.random() * 0.02 + 0.01;
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
-                    this.size = Math.random() * 3 + 2;
-                }
-                
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.vy += 0.1; // gravity
-                    this.life -= this.decay;
-                }
-                
-                draw() {
-                    ctx.save();
-                    ctx.globalAlpha = this.life;
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-            }
-            
-            function createFirework(x, y) {
-                for (let i = 0; i < 50; i++) {
-                    particles.push(new Particle(x, y));
-                }
-            }
-            
-            function animate() {
-                if (!running) {
-                    // Clear once and stop drawing
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    canvas.style.display = 'none';
-                    return;
-                }
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    particles[i].update();
-                    particles[i].draw();
-                    
-                    if (particles[i].life <= 0) {
-                        particles.splice(i, 1);
-                    }
-                }
-                
-                requestAnimationFrame(animate);
-            }
-            
-            // Create fireworks on page load and periodically (first 1.5s)
-            setTimeout(() => {
-                createFirework(canvas.width / 2, canvas.height / 2);
-            }, 500);
-            
-            setTimeout(() => {
-                createFirework(canvas.width * 0.3, canvas.height * 0.4);
-            }, 1000);
-            
-            setTimeout(() => {
-                createFirework(canvas.width * 0.7, canvas.height * 0.6);
-            }, 1500);
-            
-            // Create fireworks on click (only while running)
-            const clickHandler = (e) => {
-                if (!running) return;
-                createFirework(e.clientX, e.clientY);
-            };
-            document.addEventListener('click', clickHandler);
-            
-            // Stop fireworks after ~3 seconds
-            setTimeout(() => {
-                running = false;
-                document.removeEventListener('click', clickHandler);
-            }, 3000);
-            
-            animate();
-        })();
-    </script>
 </body>
 </html>
